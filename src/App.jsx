@@ -43,6 +43,29 @@ const NBI_ENCOUNTER_AUDIO_START_TIME = 0.2;
 const GAMEOVER_AUDIO_PATH = "/gameover.mp3";
 const POWER_SPLASH_DURATION_MS = 1000;
 
+const EFFECT_SOUND_CONFIG = {
+  recruit: {
+    path: RECRUIT_AUDIO_PATH,
+    startTime: RECRUIT_AUDIO_START_TIME,
+    volume: 0.74,
+  },
+  powerup: {
+    path: POWERUP_AUDIO_PATH,
+    startTime: 0,
+    volume: 0.8,
+  },
+  nbi: {
+    path: NBI_ENCOUNTER_AUDIO_PATH,
+    startTime: NBI_ENCOUNTER_AUDIO_START_TIME,
+    volume: 0.78,
+  },
+  gameover: {
+    path: GAMEOVER_AUDIO_PATH,
+    startTime: 0,
+    volume: 0.82,
+  },
+};
+
 const GATE_X_POSITIONS = [25, 75];
 const HALF_ROAD_SIDES = ["left", "right"];
 
@@ -753,6 +776,7 @@ const createSpawnObject = (id, survivalTime, ddsCount, shieldTime, spawnState) =
 
   return nbiEncounter;
 };
+
 const getNextSpawnCooldown = (spawnedObject, survivalTime) => {
   if (spawnedObject.type === "gatePair") {
     // Gates can appear a bit faster so the player can replenish.
@@ -987,10 +1011,9 @@ function App() {
   const keysRef = useRef({ left: false, right: false, up: false, down: false });
   const welcomeAudioRef = useRef(null);
   const gameplayMusicRef = useRef(null);
-  const recruitAudioRef = useRef(null);
-  const powerupAudioRef = useRef(null);
-  const nbiEncounterAudioRef = useRef(null);
-  const gameoverAudioRef = useRef(null);
+  const effectsAudioContextRef = useRef(null);
+  const effectBuffersRef = useRef({});
+  const effectLoadsRef = useRef({});
   const previousDdsCountRef = useRef(1);
   const previousShieldTimeRef = useRef(0);
   const previousNbiEncounterCountRef = useRef(0);
@@ -1027,55 +1050,115 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const audio = new Audio(RECRUIT_AUDIO_PATH);
-    audio.preload = "auto";
-    audio.volume = 0.64;
-    recruitAudioRef.current = audio;
-
     return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      recruitAudioRef.current = null;
+      const audioContext = effectsAudioContextRef.current;
+
+      if (audioContext?.state !== "closed") {
+        audioContext?.close().catch(() => {});
+      }
+
+      effectsAudioContextRef.current = null;
+      effectBuffersRef.current = {};
+      effectLoadsRef.current = {};
     };
   }, []);
 
+  const getEffectsAudioContext = () => {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) return null;
+
+    if (!effectsAudioContextRef.current) {
+      effectsAudioContextRef.current = new AudioContextClass();
+    }
+
+    return effectsAudioContextRef.current;
+  };
+
+  const resumeEffectsAudio = async () => {
+    const audioContext = getEffectsAudioContext();
+
+    if (!audioContext) return null;
+
+    if (audioContext.state === "suspended") {
+      try {
+        await audioContext.resume();
+      } catch {
+        return null;
+      }
+    }
+
+    return audioContext;
+  };
+
+  const loadEffectBuffer = async (effectKey) => {
+    if (effectBuffersRef.current[effectKey]) {
+      return effectBuffersRef.current[effectKey];
+    }
+
+    if (effectLoadsRef.current[effectKey]) {
+      return effectLoadsRef.current[effectKey];
+    }
+
+    const audioContext = getEffectsAudioContext();
+
+    if (!audioContext) return null;
+
+    const config = EFFECT_SOUND_CONFIG[effectKey];
+
+    const loadPromise = fetch(config.path)
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer.slice(0)))
+      .then((buffer) => {
+        effectBuffersRef.current[effectKey] = buffer;
+        return buffer;
+      })
+      .catch(() => null)
+      .finally(() => {
+        delete effectLoadsRef.current[effectKey];
+      });
+
+    effectLoadsRef.current[effectKey] = loadPromise;
+    return loadPromise;
+  };
+
+  const primeEffectSounds = async () => {
+    const audioContext = getEffectsAudioContext();
+
+    if (!audioContext) return;
+
+    await Promise.all(
+      Object.keys(EFFECT_SOUND_CONFIG).map((effectKey) =>
+        loadEffectBuffer(effectKey),
+      ),
+    );
+  };
+
+  const playEffectSound = async (effectKey) => {
+    if (!soundEnabled) return;
+
+    const audioContext = await resumeEffectsAudio();
+
+    if (!audioContext) return;
+
+    const buffer = await loadEffectBuffer(effectKey);
+
+    if (!buffer) return;
+
+    const { startTime = 0, volume = 1 } = EFFECT_SOUND_CONFIG[effectKey];
+    const source = audioContext.createBufferSource();
+    const gainNode = audioContext.createGain();
+
+    gainNode.gain.value = volume;
+    source.buffer = buffer;
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    source.start(0, startTime);
+  };
+
   useEffect(() => {
-    const audio = new Audio(POWERUP_AUDIO_PATH);
-    audio.preload = "auto";
-    audio.volume = 0.72;
-    powerupAudioRef.current = audio;
-
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      powerupAudioRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const audio = new Audio(NBI_ENCOUNTER_AUDIO_PATH);
-    audio.preload = "auto";
-    audio.volume = 0.7;
-    nbiEncounterAudioRef.current = audio;
-
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      nbiEncounterAudioRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const audio = new Audio(GAMEOVER_AUDIO_PATH);
-    audio.preload = "auto";
-    audio.volume = 0.74;
-    gameoverAudioRef.current = audio;
-
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      gameoverAudioRef.current = null;
-    };
+    void primeEffectSounds();
   }, []);
 
   const resetToWelcome = () => {
@@ -1120,6 +1203,11 @@ function App() {
 
     nextIdRef.current += 1;
 
+    if (soundEnabled) {
+      void primeEffectSounds();
+      void resumeEffectsAudio();
+    }
+
     setGame({
       ...createInitialGame(),
       status: "running",
@@ -1157,6 +1245,10 @@ function App() {
 
     dragRef.current = { active: true, pointerId: event.pointerId };
     event.currentTarget.setPointerCapture?.(event.pointerId);
+
+    if (soundEnabled) {
+      void resumeEffectsAudio();
+    }
   };
 
   const handlePointerMove = (event) => {
@@ -1458,18 +1550,7 @@ function App() {
       previousStatus === "running" &&
       game.ddsCount > previousDdsCount
     ) {
-      const audio = recruitAudioRef.current;
-
-      if (audio) {
-        audio.pause();
-        audio.currentTime = RECRUIT_AUDIO_START_TIME;
-
-        const playPromise = audio.play();
-
-        if (playPromise?.catch) {
-          playPromise.catch(() => {});
-        }
-      }
+      void playEffectSound("recruit");
     }
 
     previousDdsCountRef.current = game.ddsCount;
@@ -1484,18 +1565,7 @@ function App() {
       game.status === "running" &&
       game.nbiEncounterCount > previousNbiEncounterCount
     ) {
-      const audio = nbiEncounterAudioRef.current;
-
-      if (audio) {
-        audio.pause();
-        audio.currentTime = NBI_ENCOUNTER_AUDIO_START_TIME;
-
-        const playPromise = audio.play();
-
-        if (playPromise?.catch) {
-          playPromise.catch(() => {});
-        }
-      }
+      void playEffectSound("nbi");
     }
 
     previousNbiEncounterCountRef.current = game.nbiEncounterCount;
@@ -1510,29 +1580,13 @@ function App() {
       previousStatus !== "gameover"
     ) {
       const gameplayAudio = gameplayMusicRef.current;
-      const nbiAudio = nbiEncounterAudioRef.current;
-      const gameoverAudio = gameoverAudioRef.current;
 
       if (gameplayAudio) {
         gameplayAudio.pause();
         gameplayAudio.currentTime = 0;
       }
 
-      if (nbiAudio) {
-        nbiAudio.pause();
-        nbiAudio.currentTime = 0;
-      }
-
-      if (gameoverAudio) {
-        gameoverAudio.pause();
-        gameoverAudio.currentTime = 0;
-
-        const playPromise = gameoverAudio.play();
-
-        if (playPromise?.catch) {
-          playPromise.catch(() => {});
-        }
-      }
+      void playEffectSound("gameover");
     }
 
     previousGameoverStatusRef.current = game.status;
@@ -1562,20 +1616,7 @@ function App() {
         powerSplashTimeoutRef.current = 0;
       }, POWER_SPLASH_DURATION_MS);
 
-      if (soundEnabled) {
-        const audio = powerupAudioRef.current;
-
-        if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-
-          const playPromise = audio.play();
-
-          if (playPromise?.catch) {
-            playPromise.catch(() => {});
-          }
-        }
-      }
+      void playEffectSound("powerup");
     }
 
     previousShieldTimeRef.current = game.shieldTime;
@@ -1631,6 +1672,11 @@ function App() {
     const audio = welcomeAudioRef.current;
 
     setSoundEnabled(nextSoundEnabled);
+
+    if (nextSoundEnabled) {
+      void primeEffectSounds();
+      void resumeEffectsAudio();
+    }
 
     if (!audio) return;
 
@@ -1805,7 +1851,7 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className="app-shell app-shell--game">
       {soundToggle}
       <div className="game-shell">
         <div className="playfield-shell">

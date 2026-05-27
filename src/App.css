@@ -28,6 +28,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   overflow-x: hidden;
   background:
@@ -43,6 +44,7 @@ button {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
 }
 
@@ -70,6 +72,7 @@ body::after {
 
 .app-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1335,6 +1338,24 @@ body::after {
 }
 
 @media (max-width: 640px) {
+  .app-shell--game {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: max(52px, calc(env(safe-area-inset-top) + 52px));
+    padding-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .game-shell {
+    width: min(100%, 420px);
+  }
+
+  .playfield {
+    width: min(100%, calc((100dvh - 92px) * 9 / 16));
+    max-height: calc(100dvh - 92px);
+    margin-inline: auto;
+  }
+
   .power-splash {
     padding: 14px;
   }
@@ -1505,6 +1526,11 @@ body::after {
 @media (max-width: 560px) {
   .app-shell {
     padding: 14px;
+  }
+
+  .app-shell--game {
+    padding-top: max(48px, calc(env(safe-area-inset-top) + 48px));
+    padding-bottom: 6px;
   }
 
   .welcome-actions {
