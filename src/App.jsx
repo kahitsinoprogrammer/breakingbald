@@ -19,6 +19,7 @@ const LANE_PATTERN_HEIGHT = 46;
 
 const SQUAD_CANVAS_SIZE = 392;
 const SUPPORTER_BASE_SPRITE_SIZE = 94;
+const MAX_RENDERED_SUPPORTERS = 84;
 
 const BATO_SPRITE_PATHS = ["/bato-step-left.png", "/bato-step-right.png"];
 const BATO_SPRITE_WORK_SIZE = 160;
@@ -180,6 +181,7 @@ const createInitialGame = () => ({
   shieldTime: 0,
   activePowerLabel: "",
   activePowerTone: "",
+  powerActivationCount: 0,
   roadOffset: 0,
   playerX: 50,
   playerY: START_PLAYER_Y,
@@ -1015,7 +1017,7 @@ function App() {
   const effectBuffersRef = useRef({});
   const effectLoadsRef = useRef({});
   const previousDdsCountRef = useRef(1);
-  const previousShieldTimeRef = useRef(0);
+  const previousPowerActivationCountRef = useRef(0);
   const previousNbiEncounterCountRef = useRef(0);
   const previousStatusRef = useRef("idle");
   const previousGameoverStatusRef = useRef("idle");
@@ -1025,7 +1027,7 @@ function App() {
     const audio = new Audio(WELCOME_AUDIO_PATH);
     audio.loop = true;
     audio.preload = "auto";
-    audio.volume = 0.42;
+    audio.volume = 1;
     welcomeAudioRef.current = audio;
 
     return () => {
@@ -1039,7 +1041,7 @@ function App() {
     const audio = new Audio(GAMEPLAY_MUSIC_PATH);
     audio.loop = true;
     audio.preload = "auto";
-    audio.volume = 0.34;
+    audio.volume = 0.24;
     gameplayMusicRef.current = audio;
 
     return () => {
@@ -1391,6 +1393,7 @@ function App() {
           nextShieldTime > 0 ? currentGame.activePowerLabel : "";
         let activePowerTone =
           nextShieldTime > 0 ? currentGame.activePowerTone : "";
+        let powerActivationCount = currentGame.powerActivationCount;
         let status = currentGame.status;
         let message = currentGame.message;
         let nbiEncounterCount = currentGame.nbiEncounterCount;
@@ -1485,6 +1488,7 @@ function App() {
                 shieldTime += object.special.value;
                 activePowerLabel = object.special.label;
                 activePowerTone = object.special.tone;
+                powerActivationCount += 1;
               }
             }
           }
@@ -1502,6 +1506,7 @@ function App() {
           shieldTime,
           activePowerLabel,
           activePowerTone,
+          powerActivationCount,
           roadOffset: nextRoadOffset,
           playerX,
           playerY,
@@ -1535,10 +1540,9 @@ function App() {
     window.clearTimeout(powerSplashTimeoutRef.current);
     powerSplashTimeoutRef.current = 0;
     setPowerSplash(null);
-    previousShieldTimeRef.current = game.shieldTime;
 
     return undefined;
-  }, [game.shieldTime, game.status]);
+  }, [game.status]);
 
   useEffect(() => {
     const previousDdsCount = previousDdsCountRef.current;
@@ -1593,14 +1597,13 @@ function App() {
   }, [game.status, soundEnabled]);
 
   useEffect(() => {
-    const previousShieldTime = previousShieldTimeRef.current;
-    const previousStatus = previousStatusRef.current;
+    const previousPowerActivationCount =
+      previousPowerActivationCountRef.current;
 
     if (
       game.status === "running" &&
-      previousStatus === "running" &&
       game.activePowerTone &&
-      game.shieldTime > previousShieldTime + 1
+      game.powerActivationCount > previousPowerActivationCount
     ) {
       const splash = {
         tone: game.activePowerTone,
@@ -1619,13 +1622,11 @@ function App() {
       void playEffectSound("powerup");
     }
 
-    previousShieldTimeRef.current = game.shieldTime;
-
-    return () => {};
+    previousPowerActivationCountRef.current = game.powerActivationCount;
   }, [
     game.activePowerLabel,
     game.activePowerTone,
-    game.shieldTime,
+    game.powerActivationCount,
     game.status,
     soundEnabled,
   ]);
@@ -1711,7 +1712,13 @@ function App() {
   const bounceSpeed = Math.max(0.24, 0.46 - game.survivalTime * 0.004);
   const batoFrameIndex =
     game.status === "running" ? Math.floor(game.survivalTime * 7) % 2 : 0;
-  const visibleSupporterCount = Math.max(0, game.ddsCount - 1);
+  // Cap the rendered crowd so the formation stays readable even when
+  // the real DDS total becomes much larger than what the screen can show.
+  const visibleSupporterCount = clamp(
+    game.ddsCount - 1,
+    0,
+    MAX_RENDERED_SUPPORTERS,
+  );
 
   const playfieldClassName =
     `playfield ${game.status === "running" ? "playfield--running" : ""}`.trim();

@@ -1354,6 +1354,7 @@ body::after {
     width: min(100%, calc((100dvh - 92px) * 9 / 16));
     max-height: calc(100dvh - 92px);
     margin-inline: auto;
+    margin-top: 3px;
   }
 
   .power-splash {
