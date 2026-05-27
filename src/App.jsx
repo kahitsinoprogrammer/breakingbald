@@ -1813,87 +1813,85 @@ function App() {
     </div>
   ) : null;
 
-if (game.status === "idle") {
-  return (
-    <div className="app-shell app-shell--welcome">
-      {soundToggle}
+  if (game.status === "idle") {
+    return (
+      <div className="app-shell app-shell--welcome">
+        {soundToggle}
 
-      <main className="poster-welcome">
-        <div className="poster-bg" aria-hidden="true">
-          <div className="poster-sunburst" />
-          <div className="poster-grid" />
-          <div className="poster-city poster-city--left" />
-          <div className="poster-city poster-city--right" />
-        </div>
+        <main className="arcade-welcome" aria-label="Breaking Bald start screen">
+          <div className="arcade-scanlines" aria-hidden="true" />
+          <div className="arcade-stage-glow" aria-hidden="true" />
 
-        <section className="poster-content">
-          <div className="poster-title-card">
-            <p className="poster-kicker">Allen Presents</p>
+          <section className="arcade-start-screen">
+            <div className="arcade-marquee">
+              <span className="arcade-eyebrow">BATO RUN</span>
+              <h1 className="arcade-title">
+                <span>BREAKING</span>
+                <strong>BALD</strong>
+              </h1>
+            </div>
 
-            <h1 className="poster-title">
-              <span>BREAKING</span>
-              <strong>BALD</strong>
-            </h1>
-          </div>
+            <div className="arcade-showcase" aria-label="Game characters">
+              <img
+                className="arcade-power arcade-power--senate"
+                src={SENATE_IMMUNITY_SPRITE_PATH}
+                alt=""
+                draggable="false"
+              />
 
-          <div className="poster-character-zone" aria-label="Game characters">
-            <img
-              className="poster-supporter poster-supporter--one"
-              src={SUPPORTER_SPRITE_PATHS[0]}
-              alt=""
-              draggable="false"
-            />
+              <img
+                className="arcade-power arcade-power--friend"
+                src={TRUSTED_FRIEND_SPRITE_PATH}
+                alt=""
+                draggable="false"
+              />
 
-            <img
-              className="poster-supporter poster-supporter--two"
-              src={SUPPORTER_SPRITE_PATHS[1]}
-              alt=""
-              draggable="false"
-            />
+              <img
+                className="arcade-supporter arcade-supporter--left"
+                src={SUPPORTER_SPRITE_PATHS[0]}
+                alt=""
+                draggable="false"
+              />
 
-            <img
-              className="poster-nbi"
-              src={NBI_SPRITE_PATH}
-              alt=""
-              draggable="false"
-            />
+              <img
+                className="arcade-supporter arcade-supporter--right"
+                src={SUPPORTER_SPRITE_PATHS[1]}
+                alt=""
+                draggable="false"
+              />
 
-            <img
-              className="poster-power poster-power--friend"
-              src={TRUSTED_FRIEND_SPRITE_PATH}
-              alt=""
-              draggable="false"
-            />
+              <img
+                className="arcade-nbi"
+                src={NBI_SPRITE_PATH}
+                alt=""
+                draggable="false"
+              />
 
-            <img
-              className="poster-power poster-power--senate"
-              src={SENATE_IMMUNITY_SPRITE_PATH}
-              alt=""
-              draggable="false"
-            />
+              <img
+                className="arcade-bato"
+                src="/ccc.png"
+                alt="Bato"
+                draggable="false"
+              />
+            </div>
 
-            <img
-              className="poster-bato"
-              src="/ccc.png"
-              alt="Bato"
-              draggable="false"
-            />
-          </div>
+            <div className="arcade-start-panel">
+              <button
+                className="arcade-start-button"
+                type="button"
+                onClick={startGame}
+              >
+                START
+              </button>
+              <p className="arcade-credit">INSERT COURAGE</p>
+            </div>
+          </section>
+        </main>
 
-          <button
-            className="poster-start-button"
-            type="button"
-            onClick={startGame}
-          >
-            START
-          </button>
-        </section>
-      </main>
-
-      {soundPrompt}
-    </div>
-  );
-}
+        {soundPrompt}
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell app-shell--game">
