@@ -43,6 +43,8 @@ const NBI_ENCOUNTER_AUDIO_PATH = "/nbiencounter.mp3";
 const NBI_ENCOUNTER_AUDIO_START_TIME = 0.2;
 const GAMEOVER_AUDIO_PATH = "/gameover.mp3";
 const POWER_SPLASH_DURATION_MS = 1000;
+const DESKTOP_GAMEPLAY_MUSIC_VOLUME = 0.24;
+const MOBILE_GAMEPLAY_MUSIC_VOLUME = 0.14;
 
 const EFFECT_SOUND_CONFIG = {
   recruit: {
@@ -998,6 +1000,11 @@ function App() {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [showSoundPrompt, setShowSoundPrompt] = useState(true);
   const [powerSplash, setPowerSplash] = useState(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 640px)").matches
+      : false,
+  );
   const playfieldRef = useRef(null);
   const animationFrameRef = useRef(0);
   const lastFrameRef = useRef(0);
@@ -1041,13 +1048,29 @@ function App() {
     const audio = new Audio(GAMEPLAY_MUSIC_PATH);
     audio.loop = true;
     audio.preload = "auto";
-    audio.volume = 0.24;
+    audio.volume = isMobileViewport
+      ? MOBILE_GAMEPLAY_MUSIC_VOLUME
+      : DESKTOP_GAMEPLAY_MUSIC_VOLUME;
     gameplayMusicRef.current = audio;
 
     return () => {
       audio.pause();
       audio.currentTime = 0;
       gameplayMusicRef.current = null;
+    };
+  }, [isMobileViewport]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 640px)");
+    const syncViewport = () => {
+      setIsMobileViewport(mediaQuery.matches);
+    };
+
+    syncViewport();
+    mediaQuery.addEventListener("change", syncViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncViewport);
     };
   }, []);
 
