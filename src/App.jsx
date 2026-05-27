@@ -44,13 +44,13 @@ const NBI_ENCOUNTER_AUDIO_START_TIME = 0.2;
 const GAMEOVER_AUDIO_PATH = "/gameover.mp3";
 const POWER_SPLASH_DURATION_MS = 1000;
 const DESKTOP_GAMEPLAY_MUSIC_VOLUME = 0.24;
-const MOBILE_GAMEPLAY_MUSIC_VOLUME = 0.14;
+const MOBILE_GAMEPLAY_MUSIC_VOLUME = 0.07;
 
 const EFFECT_SOUND_CONFIG = {
   recruit: {
     path: RECRUIT_AUDIO_PATH,
     startTime: RECRUIT_AUDIO_START_TIME,
-    volume: 0.74,
+    volume: 0.95,
   },
   powerup: {
     path: POWERUP_AUDIO_PATH,
@@ -60,7 +60,7 @@ const EFFECT_SOUND_CONFIG = {
   nbi: {
     path: NBI_ENCOUNTER_AUDIO_PATH,
     startTime: NBI_ENCOUNTER_AUDIO_START_TIME,
-    volume: 0.78,
+    volume: 1,
   },
   gameover: {
     path: GAMEOVER_AUDIO_PATH,
