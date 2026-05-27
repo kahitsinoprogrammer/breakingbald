@@ -1824,7 +1824,7 @@ function App() {
 
           <section className="arcade-start-screen">
             <div className="arcade-marquee">
-              <span className="arcade-eyebrow">BATO RUN</span>
+              <span className="arcade-eyebrow">ALLEN PRESENTS</span>
               <h1 className="arcade-title">
                 <span>BREAKING</span>
                 <strong>BALD</strong>
