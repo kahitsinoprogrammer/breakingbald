@@ -1831,8 +1831,8 @@ if (game.status === "idle") {
             <p className="poster-kicker">Allen Presents</p>
 
             <h1 className="poster-title">
-              <span>SENATE</span>
-              <strong>RUN</strong>
+              <span>BREAKING</span>
+              <strong>BALD</strong>
             </h1>
           </div>
 
