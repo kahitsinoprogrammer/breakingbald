@@ -1813,72 +1813,75 @@ function App() {
     </div>
   ) : null;
 
-  if (game.status === "idle") {
-    return (
-      <div className="app-shell app-shell--welcome">
-        {soundToggle}
-        <div className="welcome-page">
-          <section className="welcome-hero-card">
-            <div className="welcome-copy">
-              <p className="welcome-kicker">Allen Present's</p>
-              <h1>BREAKING BALD</h1>
-              <p className="welcome-summary">
-                Grow the DDS crowd, prepare for the incoming NBI, and keep Bato
-                unarrested as long as possible.
-              </p>
+if (game.status === "idle") {
+  return (
+    <div className="app-shell app-shell--welcome">
+      {soundToggle}
 
-              <div className="welcome-actions">
-                <button
-                  className="action-button"
-                  type="button"
-                  onClick={startGame}
-                >
-                  Start Run
-                </button>
-              </div>
-            </div>
-
-            <div className="welcome-panel">
-              <h2>How It Works</h2>
-              <ul className="welcome-list">
-                <li>Drag, swipe, or use arrow keys to move across the road.</li>
-                <li>
-                  Recruit gates raise your DDS count before NBI reaches you.
-                </li>
-                <li>
-                  When NBI appears, pick the lane with the survivable count.
-                </li>
-                <li>
-                  Trusted Friend and Senate Immunity protect Bato for 5 seconds.
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          <section className="guide-grid">
-            {WELCOME_GUIDE.map((item) => (
-              <article key={item.title} className="guide-card">
-                <div className="guide-art-wrap" aria-hidden="true">
-                  <img
-                    className="guide-art"
-                    src={item.art}
-                    alt=""
-                    draggable="false"
-                  />
-                </div>
-                <div className="guide-copy">
-                  <span>{item.note}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </div>
-              </article>
-            ))}
-          </section>
+      <main className="simple-welcome">
+        <div className="simple-welcome-bg" aria-hidden="true">
+          <div className="stair stair--one" />
+          <div className="stair stair--two" />
+          <div className="stair stair--three" />
+          <div className="rail rail--one" />
+          <div className="rail rail--two" />
         </div>
-        {soundPrompt}
-      </div>
-    );
-  }
+
+        <section className="simple-title-wrap">
+          <p className="simple-kicker">Allen Presents</p>
+
+          <h1 className="simple-title">
+            <span>BREAKING</span>
+            <strong>BALD</strong>
+          </h1>
+        </section>
+
+        <section
+          className="simple-character-stage"
+          aria-label="Game characters"
+        >
+          <img
+            className="welcome-supporter welcome-supporter--left"
+            src={SUPPORTER_SPRITE_PATHS[0]}
+            alt=""
+            draggable="false"
+          />
+
+          <img
+            className="welcome-nbi"
+            src={NBI_SPRITE_PATH}
+            alt=""
+            draggable="false"
+          />
+
+          <img
+            className="welcome-supporter welcome-supporter--right"
+            src={SUPPORTER_SPRITE_PATHS[1]}
+            alt=""
+            draggable="false"
+          />
+
+          <img
+            className="welcome-bato"
+            src="/ccc.png"
+            alt="Bato"
+            draggable="false"
+          />
+        </section>
+
+        <button
+          className="simple-start-button"
+          type="button"
+          onClick={startGame}
+        >
+          START
+        </button>
+      </main>
+
+      {soundPrompt}
+    </div>
+  );
+}
 
   return (
     <div className="app-shell app-shell--game">
