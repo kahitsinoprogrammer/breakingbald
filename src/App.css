@@ -1553,7 +1553,51 @@ body::after {
 
 
 
+@media (max-width: 640px) {
+  .simple-welcome {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    border: 0;
+    box-shadow: none;
+  }
 
+  .simple-title-wrap {
+    padding-top: 72px;
+  }
+
+  .simple-title {
+    font-size: clamp(3rem, 18vw, 5rem);
+    padding: 8px 22px 12px;
+    border-radius: 24px;
+  }
+
+  .welcome-bato {
+    right: -5%;
+    bottom: 14%;
+    width: clamp(210px, 62vw, 290px);
+  }
+
+  .welcome-nbi {
+    right: 37%;
+    bottom: 27%;
+    width: clamp(105px, 32vw, 145px);
+  }
+
+  .welcome-supporter--left {
+    left: 1%;
+    bottom: 31%;
+  }
+
+  .welcome-supporter--right {
+    right: 9%;
+    bottom: 42%;
+  }
+
+  .simple-start-button {
+    bottom: 8%;
+  }
+}
 
 
 
@@ -1562,9 +1606,9 @@ body::after {
 
 .simple-welcome {
   position: relative;
-  width: min(100vw, 920px);
-  height: min(100vh, 560px);
-  min-height: 520px;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
   margin: 0 auto;
   overflow: hidden;
   background:
