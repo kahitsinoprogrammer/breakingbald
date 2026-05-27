@@ -1820,7 +1820,7 @@ function App() {
         <div className="welcome-page">
           <section className="welcome-hero-card">
             <div className="welcome-copy">
-              <p className="welcome-kicker">Arcade Runner Prototype</p>
+              <p className="welcome-kicker">Allen Present's</p>
               <h1>BREAKING BALD</h1>
               <p className="welcome-summary">
                 Grow the DDS crowd, prepare for the incoming NBI, and keep Bato
