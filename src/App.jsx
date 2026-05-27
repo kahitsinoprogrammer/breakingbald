@@ -1818,64 +1818,76 @@ if (game.status === "idle") {
     <div className="app-shell app-shell--welcome">
       {soundToggle}
 
-      <main className="simple-welcome">
-        <div className="simple-welcome-bg" aria-hidden="true">
-          <div className="stair stair--one" />
-          <div className="stair stair--two" />
-          <div className="stair stair--three" />
-          <div className="rail rail--one" />
-          <div className="rail rail--two" />
+      <main className="poster-welcome">
+        <div className="poster-bg" aria-hidden="true">
+          <div className="poster-sunburst" />
+          <div className="poster-grid" />
+          <div className="poster-city poster-city--left" />
+          <div className="poster-city poster-city--right" />
         </div>
 
-        <section className="simple-title-wrap">
-          <p className="simple-kicker">Allen Presents</p>
+        <section className="poster-content">
+          <div className="poster-title-card">
+            <p className="poster-kicker">Allen Presents</p>
 
-          <h1 className="simple-title">
-            <span>BREAKING</span>
-            <strong>BALD</strong>
-          </h1>
+            <h1 className="poster-title">
+              <span>SENATE</span>
+              <strong>RUN</strong>
+            </h1>
+          </div>
+
+          <div className="poster-character-zone" aria-label="Game characters">
+            <img
+              className="poster-supporter poster-supporter--one"
+              src={SUPPORTER_SPRITE_PATHS[0]}
+              alt=""
+              draggable="false"
+            />
+
+            <img
+              className="poster-supporter poster-supporter--two"
+              src={SUPPORTER_SPRITE_PATHS[1]}
+              alt=""
+              draggable="false"
+            />
+
+            <img
+              className="poster-nbi"
+              src={NBI_SPRITE_PATH}
+              alt=""
+              draggable="false"
+            />
+
+            <img
+              className="poster-power poster-power--friend"
+              src={TRUSTED_FRIEND_SPRITE_PATH}
+              alt=""
+              draggable="false"
+            />
+
+            <img
+              className="poster-power poster-power--senate"
+              src={SENATE_IMMUNITY_SPRITE_PATH}
+              alt=""
+              draggable="false"
+            />
+
+            <img
+              className="poster-bato"
+              src="/ccc.png"
+              alt="Bato"
+              draggable="false"
+            />
+          </div>
+
+          <button
+            className="poster-start-button"
+            type="button"
+            onClick={startGame}
+          >
+            START
+          </button>
         </section>
-
-        <section
-          className="simple-character-stage"
-          aria-label="Game characters"
-        >
-          <img
-            className="welcome-supporter welcome-supporter--left"
-            src={SUPPORTER_SPRITE_PATHS[0]}
-            alt=""
-            draggable="false"
-          />
-
-          <img
-            className="welcome-nbi"
-            src={NBI_SPRITE_PATH}
-            alt=""
-            draggable="false"
-          />
-
-          <img
-            className="welcome-supporter welcome-supporter--right"
-            src={SUPPORTER_SPRITE_PATHS[1]}
-            alt=""
-            draggable="false"
-          />
-
-          <img
-            className="welcome-bato"
-            src="/ccc.png"
-            alt="Bato"
-            draggable="false"
-          />
-        </section>
-
-        <button
-          className="simple-start-button"
-          type="button"
-          onClick={startGame}
-        >
-          START
-        </button>
       </main>
 
       {soundPrompt}
